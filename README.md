@@ -10,9 +10,11 @@ This repository contains all the code needed to train and evaluate the models fe
 `btc_reproduced.log`: output of BTC Go-S evaluation, resulting in 0.74 AED
 
 `environment-btc.yml`, `environment.yml`: conda environment specifications
+
 Use `conda env create -f environment.yml` to use.
 
 `nix.conf`: configuration to use nix on HiPerGator
+
 Use the following nixpkgs revision: `flake:nixpkgs github:NixOS/nixpkgs/ec750fd01963ab6b20ee1f0cb488754e8036d89d`
 
 ### btc\_processing
