@@ -1,0 +1,32 @@
+#!/bin/python3
+from argparse import ArgumentParser
+from pathlib import Path
+from os import execv
+
+parser = ArgumentParser()
+parser.add_argument("-n", "--nojob", action="store_true", help="Run outside of SLURM job")
+parser.add_argument("-b", "--batch", type=str, help="Batch command to run")
+parser.add_argument("-d", "--dir", type=str, help="Directory to run command in", default=".")
+parser.add_argument("-t", "--time", type=str, default=60, help="Length of job (min, days-hours)")
+parser.add_argument("-c", "--cpus", type=int, default=2, help="Number of CPUs")
+parser.add_argument("-g", "--gpus", type=int, default=1, help="Number of A100 GPUs")
+parser.add_argument("-m", "--mem", type=int, default=32, help="Amount of memory (GB)")
+
+args = parser.parse_args()
+
+d = Path(__file__).resolve().parent
+
+cmd = []
+if not args.nojob:
+    gpus = "" if args.gpus == 0 else f"-p gpu --gpus a100:{args.gpus}" 
+    scmd, pty = ("sbatch", "") if args.batch else ("srun", "--pty")
+    cmd = (f"/opt/slurm/bin/{scmd} --ntasks 1 --cpus-per-task {args.cpus}"
+           f"    {gpus} --mem {args.mem}G -t {args.time} {pty}").split()
+
+if args.batch:
+    cmd += [d/"batch.sh", args.dir, args.batch]
+else:
+    cmd += [d/"nix-user-chroot", d/"nix", "bash", "--rcfile", d/"devrc"]
+
+cmd = [str(s) for s in cmd]
+execv(cmd[0], cmd)

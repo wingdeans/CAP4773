@@ -1,0 +1,4 @@
+. ~/.bashrc
+. ~/.nix-profile/etc/profile.d/nix.sh
+ml conda
+mamba activate "$(dirname $BASH_SOURCE)/conda"
